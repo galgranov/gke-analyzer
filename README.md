@@ -1,76 +1,80 @@
-# MyMonorepo
+# GKE Analyzer
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+A tool for analyzing Google Kubernetes Engine (GKE) pods and resources.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is almost ready ✨.
+## MongoDB Cloud Connection Setup
 
-Run `npx nx graph` to visually explore what got created. Now, let's get you up to speed!
+This application uses MongoDB for data storage. Follow these steps to connect to a MongoDB cloud cluster:
 
-## Finish your CI setup
+### 1. Create a MongoDB Atlas Account
 
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/x4WtFL5jfw)
+If you don't already have one, create an account at [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
 
+### 2. Create a Cluster
 
-## Run tasks
+- Log in to your MongoDB Atlas account
+- Create a new cluster (Free tier is available)
+- Choose your preferred cloud provider and region
 
-To run tasks with Nx use:
+### 3. Set Up Database Access
 
-```sh
-npx nx <target> <project-name>
+- In the MongoDB Atlas dashboard, go to "Database Access"
+- Create a new database user with appropriate permissions
+- Remember the username and password
+
+### 4. Set Up Network Access
+
+- Go to "Network Access" in the MongoDB Atlas dashboard
+- Add your IP address to the IP Access List
+- For development, you can allow access from anywhere (0.0.0.0/0)
+
+### 5. Get Your Connection String
+
+- Go to "Clusters" and click "Connect"
+- Choose "Connect your application"
+- Select "Node.js" as the driver and the appropriate version
+- Copy the connection string
+
+### 6. Configure Your .env File
+
+Update your `.env` file with the MongoDB connection string:
+
+```
+# MongoDB Connection
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-url>/<database>?retryWrites=true&w=majority
+MONGODB_DB_NAME=gke-analyzer
+
+# Replace:
+# - <username> with your MongoDB Atlas username
+# - <password> with your MongoDB Atlas password
+# - <cluster-url> with your cluster URL
+# - <database> with your database name (default: gke-analyzer)
 ```
 
-For example:
+## Running the Application
 
-```sh
-npx nx build myproject
+To run the application:
+
+```bash
+# Start the API server
+npx nx serve api
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+## Environment Variables
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+The application uses the following environment variables:
 
-## Add new projects
+### MongoDB Configuration
+- `MONGODB_URI`: MongoDB connection string (required)
+- `MONGODB_DB_NAME`: MongoDB database name (required)
+- `MONGODB_SERVER_SELECTION_TIMEOUT_MS`: Server selection timeout in milliseconds (default: 10000)
+- `MONGODB_CONNECT_TIMEOUT_MS`: Connection timeout in milliseconds (default: 15000)
+- `MONGODB_SOCKET_TIMEOUT_MS`: Socket timeout in milliseconds (default: 45000)
+- `MONGODB_MAX_POOL_SIZE`: Maximum connection pool size (default: 50)
+- `MONGODB_MIN_POOL_SIZE`: Minimum connection pool size (default: 5)
+- `MONGODB_RETRY_WRITES`: Whether to retry writes (default: true)
+- `MONGODB_RETRY_READS`: Whether to retry reads (default: true)
 
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
-
-To install a new plugin you can use the `nx add` command. Here's an example of adding the React plugin:
-```sh
-npx nx add @nx/react
-```
-
-Use the plugin's generator to create new projects. For example, to create a new React app or library:
-
-```sh
-# Generate an app
-npx nx g @nx/react:app demo
-
-# Generate a library
-npx nx g @nx/react:lib some-lib
-```
-
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
-
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Useful links
-
-Learn more:
-
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### API Configuration
+- `PORT`: Port to run the API server on (default: 3000)
+- `NODE_ENV`: Environment mode (development, production, test) (default: development)
