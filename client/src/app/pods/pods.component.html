@@ -2,7 +2,7 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center">
       <h1 class="text-2xl font-semibold text-gray-900">Kubernetes Pods</h1>
-      <div>
+      <div class="flex space-x-2">
         <button class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" (click)="loadPods()">
           <svg *ngIf="loading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -10,6 +10,9 @@
           </svg>
           <span *ngIf="!loading">Refresh</span>
           <span *ngIf="loading">Refreshing...</span>
+        </button>
+        <button *ngIf="!loading && pods.length > 0" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" (click)="clearFilters()">
+          Clear Filters
         </button>
       </div>
     </div>
@@ -44,21 +47,180 @@
     </div>
     
     <div *ngIf="!loading && !error && pods.length > 0" class="mt-6 bg-white shadow overflow-hidden sm:rounded-lg">
-      <div class="overflow-x-auto">
+      <!-- Table with horizontal scrollbar -->
+      <div class="overflow-x-auto max-h-[70vh] overflow-y-auto">
         <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+          <thead class="bg-gray-50 sticky top-0 z-10">
             <tr>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Namespace</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cluster</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Node</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pod IP</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Host IP</th>
+              <!-- Filter inputs row -->
+              <th class="px-6 py-2 bg-gray-100">
+                <select
+                  class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                  [(ngModel)]="filters['name']"
+                  (change)="applyFilters()"
+                >
+                  <option value="">All Names</option>
+                  <option *ngFor="let option of filterOptions['name']" [value]="option">{{ option }}</option>
+                </select>
+              </th>
+              <th class="px-6 py-2 bg-gray-100">
+                <select
+                  class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                  [(ngModel)]="filters['namespace']"
+                  (change)="applyFilters()"
+                >
+                  <option value="">All Namespaces</option>
+                  <option *ngFor="let option of filterOptions['namespace']" [value]="option">{{ option }}</option>
+                </select>
+              </th>
+              <th class="px-6 py-2 bg-gray-100">
+                <select
+                  class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                  [(ngModel)]="filters['status']"
+                  (change)="applyFilters()"
+                >
+                  <option value="">All Statuses</option>
+                  <option *ngFor="let option of filterOptions['status']" [value]="option">{{ option }}</option>
+                </select>
+              </th>
+              <th class="px-6 py-2 bg-gray-100">
+                <select
+                  class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                  [(ngModel)]="filters['clusterName']"
+                  (change)="applyFilters()"
+                >
+                  <option value="">All Clusters</option>
+                  <option *ngFor="let option of filterOptions['clusterName']" [value]="option">{{ option }}</option>
+                </select>
+              </th>
+              <th class="px-6 py-2 bg-gray-100">
+                <select
+                  class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                  [(ngModel)]="filters['nodeName']"
+                  (change)="applyFilters()"
+                >
+                  <option value="">All Nodes</option>
+                  <option *ngFor="let option of filterOptions['nodeName']" [value]="option">{{ option }}</option>
+                </select>
+              </th>
+              <th class="px-6 py-2 bg-gray-100">
+                <select
+                  class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                  [(ngModel)]="filters['podIP']"
+                  (change)="applyFilters()"
+                >
+                  <option value="">All Pod IPs</option>
+                  <option *ngFor="let option of filterOptions['podIP']" [value]="option">{{ option }}</option>
+                </select>
+              </th>
+              <th class="px-6 py-2 bg-gray-100">
+                <select
+                  class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                  [(ngModel)]="filters['hostIP']"
+                  (change)="applyFilters()"
+                >
+                  <option value="">All Host IPs</option>
+                  <option *ngFor="let option of filterOptions['hostIP']" [value]="option">{{ option }}</option>
+                </select>
+              </th>
+            </tr>
+            <!-- Column headers with sorting -->
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" (click)="sort('name')">
+                <div class="flex items-center">
+                  <span>Name</span>
+                  <span class="ml-1">
+                    <svg *ngIf="sortColumn === 'name' && sortDirection === 'asc'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                    </svg>
+                    <svg *ngIf="sortColumn === 'name' && sortDirection === 'desc'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </span>
+                </div>
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" (click)="sort('namespace')">
+                <div class="flex items-center">
+                  <span>Namespace</span>
+                  <span class="ml-1">
+                    <svg *ngIf="sortColumn === 'namespace' && sortDirection === 'asc'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                    </svg>
+                    <svg *ngIf="sortColumn === 'namespace' && sortDirection === 'desc'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </span>
+                </div>
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" (click)="sort('status')">
+                <div class="flex items-center">
+                  <span>Status</span>
+                  <span class="ml-1">
+                    <svg *ngIf="sortColumn === 'status' && sortDirection === 'asc'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                    </svg>
+                    <svg *ngIf="sortColumn === 'status' && sortDirection === 'desc'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </span>
+                </div>
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" (click)="sort('clusterName')">
+                <div class="flex items-center">
+                  <span>Cluster</span>
+                  <span class="ml-1">
+                    <svg *ngIf="sortColumn === 'clusterName' && sortDirection === 'asc'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                    </svg>
+                    <svg *ngIf="sortColumn === 'clusterName' && sortDirection === 'desc'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </span>
+                </div>
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" (click)="sort('nodeName')">
+                <div class="flex items-center">
+                  <span>Node</span>
+                  <span class="ml-1">
+                    <svg *ngIf="sortColumn === 'nodeName' && sortDirection === 'asc'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                    </svg>
+                    <svg *ngIf="sortColumn === 'nodeName' && sortDirection === 'desc'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </span>
+                </div>
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" (click)="sort('podIP')">
+                <div class="flex items-center">
+                  <span>Pod IP</span>
+                  <span class="ml-1">
+                    <svg *ngIf="sortColumn === 'podIP' && sortDirection === 'asc'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                    </svg>
+                    <svg *ngIf="sortColumn === 'podIP' && sortDirection === 'desc'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </span>
+                </div>
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" (click)="sort('hostIP')">
+                <div class="flex items-center">
+                  <span>Host IP</span>
+                  <span class="ml-1">
+                    <svg *ngIf="sortColumn === 'hostIP' && sortDirection === 'asc'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                    </svg>
+                    <svg *ngIf="sortColumn === 'hostIP' && sortDirection === 'desc'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </span>
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr *ngFor="let pod of pods">
+            <tr *ngFor="let pod of filteredPods" class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="text-sm font-medium text-gray-900">{{ pod.name }}</div>
                 <div class="text-xs text-gray-500" *ngIf="pod.containerImages && pod.containerImages.length > 0">
@@ -82,8 +244,17 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ pod.podIP }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ pod.hostIP }}</td>
             </tr>
+            <tr *ngIf="filteredPods.length === 0">
+              <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
+                No pods match the current filters. <button class="text-primary hover:underline" (click)="clearFilters()">Clear filters</button>
+              </td>
+            </tr>
           </tbody>
         </table>
+      </div>
+      <!-- Results count -->
+      <div class="px-6 py-3 bg-gray-50 border-t border-gray-200 text-xs text-gray-500">
+        Showing {{ filteredPods.length }} of {{ pods.length }} pods
       </div>
     </div>
   </div>
