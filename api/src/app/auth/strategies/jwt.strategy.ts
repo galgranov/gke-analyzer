@@ -18,6 +18,20 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
+    // Special case for test tokens (only in development mode)
+    if (this.configService.isDevelopment && payload.isTestToken) {
+      return {
+        _id: payload.sub,
+        username: payload.username,
+        email: 'test@example.com',
+        roles: ['user', 'admin'], // Include admin role for testing all endpoints
+        firstName: 'Test',
+        lastName: 'User',
+        isActive: true
+      };
+    }
+    
+    // Normal validation for real tokens
     const user = await this.usersService.findOne(payload.sub);
     
     if (!user) {

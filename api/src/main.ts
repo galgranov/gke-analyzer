@@ -29,6 +29,17 @@ async function bootstrap() {
     .setDescription('The GKE Analyzer API documentation')
     .setVersion('1.0')
     .addTag('pods')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'JWT-auth', // This name here is important for reference in the controller
+    )
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);

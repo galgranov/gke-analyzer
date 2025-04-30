@@ -7,17 +7,52 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Public } from '../auth/decorators/public.decorator';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { PodsService } from './pods.service';
 import { CreatePodDto, UpdatePodDto } from './dto';
 import { Pod } from './interfaces/pod.interface';
 import { PodEntity } from './entities/pod.entity';
 
 @ApiTags('pods')
+@ApiBearerAuth('JWT-auth')
+@UseGuards(JwtAuthGuard)
 @Controller('pods')
 export class PodsController {
   constructor(private readonly podsService: PodsService) {}
+
+  @Public()
+  @Get('test')
+  @ApiOperation({ summary: 'Test endpoint that does not require authentication' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Returns a test message.',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string' }
+      }
+    }
+  })
+  test(): { message: string } {
+    return { message: 'This is a public test endpoint for the pods controller' };
+  }
+
+  @Public()
+  @Get('public')
+  @ApiOperation({ summary: 'Public endpoint that returns a limited set of pods without authentication' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Return a limited set of pods.',
+    type: [PodEntity]
+  })
+  findPublic(): Promise<Pod[]> {
+    // Return a limited set of pods for public access
+    return this.podsService.findAll().then(pods => pods.slice(0, 5));
+  }
 
   @Post()
   @ApiOperation({ summary: 'Create a new pod' })
