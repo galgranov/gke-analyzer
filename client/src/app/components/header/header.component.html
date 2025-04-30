@@ -1,49 +1,59 @@
-<header class="header">
-  <div class="container">
-    <div class="logo">
-      <a routerLink="/">GKE Analyzer</a>
+<header class="bg-white border-b border-gray-200 h-16">
+  <div class="flex justify-between items-center h-full px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center">
+      <h1 class="text-lg font-semibold text-gray-800">Dashboard</h1>
     </div>
     
-    <button class="menu-toggle" (click)="toggleMenu()" aria-label="Toggle menu">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
-    
-    <nav class="nav" [class.open]="isMenuOpen">
-      <ul class="nav-list">
-        <li class="nav-item">
-          <a routerLink="/pods" routerLinkActive="active">Pods</a>
-        </li>
-        
+    <div class="flex items-center space-x-4">
+      <!-- Search -->
+      <div class="hidden md:block">
+        <div class="relative">
+          <input type="text" placeholder="Search..." class="w-64 pl-10 pr-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </div>
+      </div>
+      
+      <!-- User menu -->
+      <div class="relative">
         <ng-container *ngIf="currentUser">
-          <li class="nav-item user-info">
-            <span class="username">{{ currentUser.username }}</span>
-            <div class="dropdown">
-              <ul class="dropdown-menu">
-                <li *ngIf="currentUser.roles?.includes('admin')" class="dropdown-item">
-                  <a routerLink="/admin">Admin Panel</a>
-                </li>
-                <li class="dropdown-item">
-                  <a routerLink="/profile">Profile</a>
-                </li>
-                <li class="dropdown-item">
-                  <button (click)="logout()">Logout</button>
-                </li>
-              </ul>
+          <button (click)="toggleUserMenu()" class="flex items-center space-x-2 focus:outline-none">
+            <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
+              {{ currentUser.username.charAt(0).toUpperCase() }}
             </div>
-          </li>
+            <span class="hidden md:block text-sm font-medium text-gray-700">{{ currentUser.username }}</span>
+            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </button>
+          
+          <div *ngIf="isUserMenuOpen" class="absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-50">
+            <a *ngIf="currentUser.roles?.includes('admin')" routerLink="/admin" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+              Admin Panel
+            </a>
+            <a routerLink="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+              Your Profile
+            </a>
+            <button (click)="logout()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+              Sign out
+            </button>
+          </div>
         </ng-container>
         
         <ng-container *ngIf="!currentUser">
-          <li class="nav-item">
-            <a routerLink="/login" routerLinkActive="active">Login</a>
-          </li>
-          <li class="nav-item">
-            <a routerLink="/register" routerLinkActive="active" class="register-btn">Register</a>
-          </li>
+          <div class="flex space-x-2">
+            <a routerLink="/login" class="text-sm font-medium text-gray-700 hover:text-primary">
+              Sign in
+            </a>
+            <a routerLink="/register" class="text-sm font-medium bg-primary text-white px-3 py-1 rounded-md hover:bg-primary-dark">
+              Sign up
+            </a>
+          </div>
         </ng-container>
-      </ul>
-    </nav>
+      </div>
+    </div>
   </div>
 </header>

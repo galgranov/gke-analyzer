@@ -12,6 +12,21 @@ export const appRoutes: Route[] = [
     children: [
       { path: '', redirectTo: 'pods', pathMatch: 'full' },
       { path: 'pods', component: PodsComponent, canActivate: [AuthGuard] },
+      { 
+        path: 'configuration', 
+        loadComponent: () => import('./configuration/configuration.component').then(m => m.ConfigurationComponent),
+        canActivate: [AuthGuard] 
+      },
+      { 
+        path: 'cluster', 
+        loadComponent: () => import('./cluster/cluster.component').then(m => m.ClusterComponent),
+        canActivate: [AuthGuard] 
+      },
+      { 
+        path: 'cloud', 
+        loadComponent: () => import('./cloud/cloud.component').then(m => m.CloudComponent),
+        canActivate: [AuthGuard] 
+      },
     ]
   },
   { path: 'login', component: LoginComponent },

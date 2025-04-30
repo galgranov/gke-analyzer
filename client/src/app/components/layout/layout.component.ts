@@ -12,4 +12,9 @@ import { HeaderComponent } from '../header/header.component';
 })
 export class LayoutComponent {
   currentYear = new Date().getFullYear();
+  isSidebarCollapsed = false;
+  
+  toggleSidebar(): void {
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
+  }
 }
