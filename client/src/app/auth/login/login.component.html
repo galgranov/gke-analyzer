@@ -1,0 +1,51 @@
+<div class="login-container">
+  <div class="login-card">
+    <h2>Login</h2>
+    
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="usernameOrEmail">Username or Email</label>
+        <input 
+          type="text" 
+          id="usernameOrEmail" 
+          formControlName="usernameOrEmail" 
+          placeholder="Enter username or email"
+          [ngClass]="{'invalid': loginForm.get('usernameOrEmail')?.invalid && loginForm.get('usernameOrEmail')?.touched}"
+        >
+        <div class="error-message" *ngIf="loginForm.get('usernameOrEmail')?.invalid && loginForm.get('usernameOrEmail')?.touched">
+          <span *ngIf="loginForm.get('usernameOrEmail')?.errors?.['required']">Username or email is required</span>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          formControlName="password" 
+          placeholder="Enter password"
+          [ngClass]="{'invalid': loginForm.get('password')?.invalid && loginForm.get('password')?.touched}"
+        >
+        <div class="error-message" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+          <span *ngIf="loginForm.get('password')?.errors?.['required']">Password is required</span>
+          <span *ngIf="loginForm.get('password')?.errors?.['minlength']">Password must be at least 8 characters</span>
+        </div>
+      </div>
+      
+      <div class="error-alert" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+      
+      <div class="form-actions">
+        <button type="submit" [disabled]="loginForm.invalid || loading">
+          <span *ngIf="!loading">Login</span>
+          <span *ngIf="loading">Logging in...</span>
+        </button>
+      </div>
+      
+      <div class="register-link">
+        Don't have an account? <a routerLink="/register">Register</a>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,49 @@
+<header class="header">
+  <div class="container">
+    <div class="logo">
+      <a routerLink="/">GKE Analyzer</a>
+    </div>
+    
+    <button class="menu-toggle" (click)="toggleMenu()" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    
+    <nav class="nav" [class.open]="isMenuOpen">
+      <ul class="nav-list">
+        <li class="nav-item">
+          <a routerLink="/pods" routerLinkActive="active">Pods</a>
+        </li>
+        
+        <ng-container *ngIf="currentUser">
+          <li class="nav-item user-info">
+            <span class="username">{{ currentUser.username }}</span>
+            <div class="dropdown">
+              <ul class="dropdown-menu">
+                <li *ngIf="currentUser.roles?.includes('admin')" class="dropdown-item">
+                  <a routerLink="/admin">Admin Panel</a>
+                </li>
+                <li class="dropdown-item">
+                  <a routerLink="/profile">Profile</a>
+                </li>
+                <li class="dropdown-item">
+                  <button (click)="logout()">Logout</button>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ng-container>
+        
+        <ng-container *ngIf="!currentUser">
+          <li class="nav-item">
+            <a routerLink="/login" routerLinkActive="active">Login</a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/register" routerLinkActive="active" class="register-btn">Register</a>
+          </li>
+        </ng-container>
+      </ul>
+    </nav>
+  </div>
+</header>

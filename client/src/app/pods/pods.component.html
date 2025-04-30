@@ -1,42 +1,68 @@
 <div class="pods-container">
-  <h1>Kubernetes Pods</h1>
-  
-  <div *ngIf="loading" class="loading">
-    Loading pods...
+  <div class="pods-header">
+    <h1>Kubernetes Pods</h1>
+    <div class="actions">
+      <button class="btn btn-primary" (click)="loadPods()">
+        <span *ngIf="!loading">Refresh</span>
+        <span *ngIf="loading">Refreshing...</span>
+      </button>
+    </div>
   </div>
   
-  <div *ngIf="error" class="error">
-    {{ error }}
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Loading pods...</p>
   </div>
   
-  <div *ngIf="!loading && !error && pods.length === 0" class="no-pods">
-    No pods found.
+  <div *ngIf="error" class="error-container">
+    <div class="error-icon">⚠️</div>
+    <div class="error-message">{{ error }}</div>
+    <button class="btn btn-primary" (click)="loadPods()">Try Again</button>
+  </div>
+  
+  <div *ngIf="!loading && !error && pods.length === 0" class="no-pods-container">
+    <div class="no-pods-icon">📦</div>
+    <p>No pods found.</p>
+    <p class="no-pods-hint">Try running the GKE Pod Analyzer script to collect pod information.</p>
   </div>
   
   <div *ngIf="!loading && !error && pods.length > 0" class="pods-list">
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Namespace</th>
-          <th>Status</th>
-          <th>Cluster</th>
-          <th>Node</th>
-          <th>Pod IP</th>
-          <th>Host IP</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let pod of pods">
-          <td>{{ pod.name }}</td>
-          <td>{{ pod.namespace }}</td>
-          <td>{{ pod.status }}</td>
-          <td>{{ pod.clusterName }}</td>
-          <td>{{ pod.nodeName }}</td>
-          <td>{{ pod.podIP }}</td>
-          <td>{{ pod.hostIP }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="card">
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Namespace</th>
+              <th>Status</th>
+              <th>Cluster</th>
+              <th>Node</th>
+              <th>Pod IP</th>
+              <th>Host IP</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let pod of pods">
+              <td>
+                <div class="pod-name">{{ pod.name }}</div>
+                <div class="pod-images" *ngIf="pod.containerImages && pod.containerImages.length > 0">
+                  <small>Images: {{ pod.containerImages.join(', ') }}</small>
+                </div>
+              </td>
+              <td>{{ pod.namespace }}</td>
+              <td>
+                <span class="status-badge" [ngClass]="'status-' + pod.status?.toLowerCase()">
+                  {{ pod.status }}
+                </span>
+              </td>
+              <td>{{ pod.clusterName }}</td>
+              <td>{{ pod.nodeName }}</td>
+              <td>{{ pod.podIP }}</td>
+              <td>{{ pod.hostIP }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>

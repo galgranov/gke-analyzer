@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { PodsService } from '../services/pods.service';
 import { Pod } from '@my-monorepo/api-interfaces';
 
 @Component({
   selector: 'app-pods',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './pods.component.html',
   styleUrl: './pods.component.scss'
 })
