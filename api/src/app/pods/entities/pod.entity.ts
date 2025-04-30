@@ -1,32 +1,36 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ObjectId } from 'mongodb';
 
-export class UpdatePodDto {
-  @ApiPropertyOptional({ description: 'The name of the pod' })
-  readonly name?: string;
+export class PodEntity {
+  @ApiPropertyOptional({ description: 'The MongoDB ObjectId' })
+  _id?: ObjectId;
 
-  @ApiPropertyOptional({ description: 'The namespace of the pod' })
-  readonly namespace?: string;
+  @ApiProperty({ description: 'The name of the pod' })
+  name: string;
+
+  @ApiProperty({ description: 'The namespace of the pod' })
+  namespace: string;
 
   @ApiPropertyOptional({ description: 'The status of the pod' })
-  readonly status?: string;
+  status?: string;
 
   @ApiPropertyOptional({ description: 'The name of the cluster' })
-  readonly clusterName?: string;
+  clusterName?: string;
 
   @ApiPropertyOptional({ description: 'The name of the node' })
-  readonly nodeName?: string;
+  nodeName?: string;
 
   @ApiPropertyOptional({ description: 'The labels of the pod' })
-  readonly labels?: Record<string, string>;
+  labels?: Record<string, string>;
 
   @ApiPropertyOptional({ description: 'The annotations of the pod' })
-  readonly annotations?: Record<string, string>;
+  annotations?: Record<string, string>;
 
   @ApiPropertyOptional({ description: 'The creation timestamp of the pod' })
-  readonly creationTimestamp?: Date;
+  creationTimestamp?: Date;
 
   @ApiPropertyOptional({ description: 'The container images of the pod', type: [String] })
-  readonly containerImages?: string[];
+  containerImages?: string[];
 
   @ApiPropertyOptional({ 
     description: 'The resource requests and limits of the pod',
@@ -41,7 +45,7 @@ export class UpdatePodDto {
       }
     }
   })
-  readonly resources?: {
+  resources?: {
     requests?: {
       cpu?: string;
       memory?: string;
@@ -53,11 +57,17 @@ export class UpdatePodDto {
   };
 
   @ApiPropertyOptional({ description: 'The restart count of the pod' })
-  readonly restartCount?: number;
+  restartCount?: number;
 
   @ApiPropertyOptional({ description: 'The IP address of the pod' })
-  readonly podIP?: string;
+  podIP?: string;
 
   @ApiPropertyOptional({ description: 'The IP address of the host' })
-  readonly hostIP?: string;
+  hostIP?: string;
+
+  @ApiPropertyOptional({ description: 'The creation date of the record' })
+  createdAt?: Date;
+
+  @ApiPropertyOptional({ description: 'The last update date of the record' })
+  updatedAt?: Date;
 }

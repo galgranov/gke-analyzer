@@ -17,6 +17,7 @@
     "@nestjs/core": "^10.0.2",
     "@nestjs/mongoose": "^11.0.3",
     "@nestjs/platform-express": "^10.0.2",
+    "@nestjs/swagger": "^8.1.1",
     "axios": "^1.6.0",
     "empty": "0.10.1",
     "joi": "^17.13.3",
@@ -24,6 +25,7 @@
     "mongoose": "^8.14.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0",
+    "swagger-ui-express": "^5.0.1",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
