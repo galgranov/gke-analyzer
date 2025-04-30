@@ -1,0 +1,42 @@
+<div class="pods-container">
+  <h1>Kubernetes Pods</h1>
+  
+  <div *ngIf="loading" class="loading">
+    Loading pods...
+  </div>
+  
+  <div *ngIf="error" class="error">
+    {{ error }}
+  </div>
+  
+  <div *ngIf="!loading && !error && pods.length === 0" class="no-pods">
+    No pods found.
+  </div>
+  
+  <div *ngIf="!loading && !error && pods.length > 0" class="pods-list">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Namespace</th>
+          <th>Status</th>
+          <th>Cluster</th>
+          <th>Node</th>
+          <th>Pod IP</th>
+          <th>Host IP</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let pod of pods">
+          <td>{{ pod.name }}</td>
+          <td>{{ pod.namespace }}</td>
+          <td>{{ pod.status }}</td>
+          <td>{{ pod.clusterName }}</td>
+          <td>{{ pod.nodeName }}</td>
+          <td>{{ pod.podIP }}</td>
+          <td>{{ pod.hostIP }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

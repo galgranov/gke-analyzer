@@ -13,6 +13,13 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(AppConfigService);
   
+  // Enable CORS
+  app.enableCors({
+    origin: 'http://localhost:4200', // Angular default port
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
+  
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
   
