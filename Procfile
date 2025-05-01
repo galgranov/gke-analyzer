@@ -1,1 +1,1 @@
-web: npx nx serve api
+web: npm install && npx nx serve api
