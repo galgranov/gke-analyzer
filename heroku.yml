@@ -1,0 +1,10 @@
+build:
+  config:
+    NODE_ENV: production
+  packages:
+    - name: api
+      path: api
+    - name: client
+      path: client
+run:
+  web: npm start

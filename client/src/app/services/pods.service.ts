@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Pod, CreatePodDto, UpdatePodDto } from '@my-monorepo/api-interfaces';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PodsService {
-  private apiUrl = 'http://localhost:3000/api/pods';
+  private apiUrl = `${environment.apiUrl}/pods`;
 
   constructor(private http: HttpClient) {}
 

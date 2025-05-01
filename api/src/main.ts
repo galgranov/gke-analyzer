@@ -15,7 +15,7 @@ async function bootstrap() {
   
   // Enable CORS
   app.enableCors({
-    origin: 'http://localhost:4200', // Angular default port
+    origin: '*', // Allow requests from any origin
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
@@ -44,10 +44,10 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
   
-  const port = configService.port;
+  const port = process.env.PORT || configService.port;
   const nodeEnv = configService.nodeEnv;
   
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
   
   Logger.log(
     `🚀 Application is running in ${nodeEnv} mode on: http://localhost:${port}/${globalPrefix}`
