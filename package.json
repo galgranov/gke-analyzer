@@ -5,8 +5,7 @@
   "scripts": {
     "start": "nx serve api",
     "build": "nx build api && nx build client",
-    "heroku-postbuild": "npm run build",
-    "postinstall": "npx nx init --no-interactive"
+    "heroku-postbuild": "npm run build"
   },
   "engines": {
     "node": "18.x"

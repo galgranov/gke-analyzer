@@ -1,1 +1,1 @@
-web: npm install && npx nx serve api
+web: npm install && node dist/api/main.js
