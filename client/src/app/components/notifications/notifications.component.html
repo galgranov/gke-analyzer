@@ -1,0 +1,128 @@
+<!-- Bell icon with notification count -->
+<div class="relative">
+  <button 
+    class="relative p-2 text-gray-600 hover:text-gray-800 focus:outline-none" 
+    (click)="toggleNotificationPanel()"
+    aria-label="Notifications">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+    </svg>
+    
+    <!-- Notification badge -->
+    <span *ngIf="unreadCount > 0" 
+          class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-500 rounded-full">
+      {{ unreadCount > 99 ? '99+' : unreadCount }}
+    </span>
+  </button>
+  
+  <!-- Notification panel -->
+  <div *ngIf="showNotificationPanel" 
+       [@slideInOut]
+       class="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg overflow-hidden z-50 max-h-[80vh] flex flex-col">
+    <!-- Header -->
+    <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+      <h3 class="text-sm font-medium text-gray-700">Notifications</h3>
+      <div class="flex space-x-2">
+        <button *ngIf="unreadCount > 0" 
+                class="text-xs text-blue-600 hover:text-blue-800" 
+                (click)="markAllAsRead()">
+          Mark all as read
+        </button>
+        <button *ngIf="notifications.length > 0" 
+                class="text-xs text-gray-600 hover:text-gray-800" 
+                (click)="clearAllNotifications()">
+          Clear all
+        </button>
+      </div>
+    </div>
+    
+    <!-- Notification list -->
+    <div class="overflow-y-auto flex-grow">
+      <div *ngIf="notifications.length === 0" class="py-6 text-center text-gray-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+        </svg>
+        <p class="mt-2 text-sm">No notifications</p>
+      </div>
+      
+      <div *ngFor="let notification of notifications" 
+           [@fadeInOut]
+           class="px-4 py-3 border-b border-gray-200 hover:bg-gray-50 cursor-pointer"
+           [class.bg-blue-50]="!notification.read"
+           (click)="markAsRead(notification.id)"
+           (keydown.enter)="markAsRead(notification.id)"
+           tabindex="0"
+           role="button">
+        <div class="flex items-start">
+          <!-- Icon -->
+          <div [class]="getNotificationColor(notification.type)" class="flex-shrink-0 mr-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getNotificationIcon(notification.type)" />
+            </svg>
+          </div>
+          
+          <!-- Content -->
+          <div class="flex-1 min-w-0">
+            <p class="text-sm text-gray-900" [class.font-medium]="!notification.read">
+              {{ notification.message }}
+            </p>
+            <p class="mt-1 text-xs text-gray-500">
+              {{ getTimeAgo(notification.timestamp) }}
+            </p>
+          </div>
+          
+          <!-- Close button -->
+          <button class="ml-3 flex-shrink-0 text-gray-400 hover:text-gray-600 focus:outline-none" 
+                  (click)="removeNotification(notification.id, $event)"
+                  aria-label="Remove notification">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast notifications -->
+<div class="fixed top-20 right-4 z-50 space-y-2 max-w-md">
+  <ng-container *ngFor="let notification of notifications.slice(0, 3)">
+    <div *ngIf="!notification.read"
+         [@fadeInOut]
+         class="bg-white rounded-lg shadow-lg overflow-hidden border-l-4 flex items-start p-4"
+         [class.border-green-500]="notification.type === 'success'"
+         [class.border-yellow-500]="notification.type === 'warning'"
+         [class.border-red-500]="notification.type === 'error'"
+         [class.border-blue-500]="notification.type === 'info'"
+         tabindex="0"
+         role="alert">
+    
+    <!-- Icon -->
+    <div [class]="getNotificationColor(notification.type)" class="flex-shrink-0 mr-3">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getNotificationIcon(notification.type)" />
+      </svg>
+    </div>
+    
+    <!-- Content -->
+    <div class="flex-1 min-w-0">
+      <p class="text-sm font-medium text-gray-900">
+        {{ notification.message }}
+      </p>
+      <p class="mt-1 text-xs text-gray-500">
+        {{ getTimeAgo(notification.timestamp) }}
+      </p>
+    </div>
+    
+      <!-- Close button -->
+      <button class="ml-3 flex-shrink-0 text-gray-400 hover:text-gray-600 focus:outline-none" 
+              (click)="markAsRead(notification.id)"
+              aria-label="Dismiss notification">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+  </ng-container>
+</div>
