@@ -8,6 +8,8 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app/app.module';
 import { AppConfigService } from './app/config/config.service';
+import * as express from 'express';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -22,6 +24,9 @@ async function bootstrap() {
   
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
+  
+  // Serve static files from the Angular app
+  app.use(express.static(join(process.cwd(), 'dist/client/browser')));
   
   // Setup Swagger
   const config = new DocumentBuilder()
@@ -47,13 +52,25 @@ async function bootstrap() {
   const port = process.env.PORT || configService.port;
   const nodeEnv = configService.nodeEnv;
   
+  // All other requests not handled by the API will return the Angular app
+  app.use('*', (req, res, next) => {
+    // Skip if the request is for the API
+    if (req.originalUrl.startsWith(`/${globalPrefix}`)) {
+      return next();
+    }
+    res.sendFile(join(process.cwd(), 'dist/client/browser/index.html'));
+  });
+
   await app.listen(port, '0.0.0.0');
   
   Logger.log(
-    `🚀 Application is running in ${nodeEnv} mode on: http://localhost:${port}/${globalPrefix}`
+    `🚀 Application is running in ${nodeEnv} mode on: http://localhost:${port}`
   );
   Logger.log(
     `📝 Swagger documentation is available at: http://localhost:${port}/api/docs`
+  );
+  Logger.log(
+    `🌐 Angular client is available at: http://localhost:${port}`
   );
 }
 
