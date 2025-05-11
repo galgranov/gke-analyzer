@@ -8,12 +8,15 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app/app.module';
 import { AppConfigService } from './app/config/config.service';
+import { HealthService } from './app/health/health.service';
 import * as express from 'express';
 import { join } from 'path';
+import { createTerminus } from '@godaddy/terminus';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(AppConfigService);
+  const healthService = app.get(HealthService);
   
   // Enable CORS
   app.enableCors({
@@ -61,6 +64,31 @@ async function bootstrap() {
     res.sendFile(join(process.cwd(), 'dist/client/browser/index.html'));
   });
 
+  // Set up Terminus health checks for Kubernetes probes
+  const httpServer = app.getHttpServer();
+  createTerminus(httpServer, {
+    logger: (msg: string, err: Error) => {
+      if (err) {
+        Logger.error(`${msg}: ${err.message}`, err.stack);
+      } else {
+        Logger.log(msg);
+      }
+    },
+    healthChecks: {
+      '/health/liveness': async () => {
+        return healthService.liveness();
+      },
+      '/health/readiness': async () => {
+        const result = await healthService.readiness();
+        // If status is not 'ok', throw an error to trigger a non-200 response
+        if (result.status !== 'ok') {
+          throw new Error('Service not ready');
+        }
+        return result;
+      },
+    },
+  });
+
   await app.listen(port, '0.0.0.0');
   
   Logger.log(
@@ -71,6 +99,11 @@ async function bootstrap() {
   );
   Logger.log(
     `🌐 Angular client is available at: http://localhost:${port}`
+  );
+  Logger.log(
+    `🏥 Health checks are available at:
+     - Liveness: http://localhost:${port}/health/liveness
+     - Readiness: http://localhost:${port}/health/readiness`
   );
 }
 
