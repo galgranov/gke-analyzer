@@ -6,8 +6,8 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { AppModule } from './app/app.module';
-import { AppConfigService } from './app/config/config.service';
+import { AppModule } from './app/app.module.js';
+import { AppConfigService } from './app/config/config.service.js';
 import { HealthService } from './app/health/health.service';
 import * as express from 'express';
 import { join } from 'path';

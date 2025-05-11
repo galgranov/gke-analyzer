@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleInit, Inject } from '@nestjs/common';
-import { DATABASE_CONNECTION } from '../database/database.providers';
+import { DATABASE_CONNECTION } from '../database/database.providers.js';
 import { Db } from 'mongodb';
 
 @Injectable()
